@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+
+
+	<script type="text/javascript">
+    function createKeenWebAutoCollector(){window.keenWebAutoCollector=window.KeenWebAutoCollector.create({projectId:'59718631c9e77c0001877e8e',writeKey:'30223D1AABAD993F54ABDBCFE2723693917A43280D76020392D60C53FE640647DF46E7EB56E558B2E31CE883B939372C8805587EBB4DE10957B06C22BE115672B2892853F01E3460AEA9EFC808DAAB3FC0705D5B806E645CF607D1A857A06569',onloadCallbacks:window.keenWebAutoCollector.onloadCallbacks}),window.keenWebAutoCollector.loaded()}function initKeenWebAutoCollector(){window.keenWebAutoCollector.domReady()?window.createKeenWebAutoCollector():document.addEventListener("readystatechange",function(){window.keenWebAutoCollector.domReady()&&window.createKeenWebAutoCollector()})}window.keenWebAutoCollector={onloadCallbacks:[],onload:function(a){this.onloadCallbacks.push(a)},domReady:function(){return["ready","complete"].indexOf(document.readyState)>-1}};
+  </script>
+  <script async type="text/javascript" src="https://d26b395fwzu5fz.cloudfront.net/keen-web-autocollector-1.0.8.min.js" onload="initKeenWebAutoCollector()"></script>
+  
+	
+
+
+</head>
+
+<body>
+	<a href="https://www.gopikolo.com/">
+<img border="0" alt="Pikolo" src="logo.png" width="100" height="100">
+</a>
+	<div class="container">
+	<div class="row">
+           <div id="custom-search-input">
+           	<div class= "col-md-6 col-md-offset-3">
+                <div class="input-group">
+                   	<input type="text" class="search-query form-control" placeholder="Search Instagram Handle" id="search" onkeydown="key_down(event)"/>
+                        <span class="input-group-btn">
+                            <button class="btn btn-danger" type="button" style="background-color:rgb(251, 70, 78)" id="button">
+                                <span class=" glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+                </div>
+            </div>
+            </div>
+	</div>
+</div>
+</br>
+
+<canvas id="myCanvas" width="200" height="73" style="display:block;">
+</canvas>
+
+
+
+<script>
+
+function key_down(e) {
+    if(e.keyCode === 13) {
+    	display(document.getElementById("search").value);
+    }
+  }
+
+document.getElementById("button").addEventListener("click", function() {
+    display(document.getElementById("search").value);
+}, false);
+
+
+function display(username) {
+
+	var insta =$.ajax({
+        url: "https://crossorigin.me/https://www.instagram.com/" + username + "/media/",
+        dataType: "json",
+        success: function(data) {
+        	if(data.items.length == 0) {
+				privateAccount(username);
+
+		} else {
+        		filter(data);
+        		var Id = [];
+        		var like = []
+        		var com = [];
+        		var ID = getIdArray(data, Id);
+				var likes = getLikesArray(data, like);
+				var comments = getCommentsArray(data, com)
+				var chart = makeChart(ID, likes, comments, document.getElementById("search").value);
+			}
+
+	},  error: function(error){
+        noAccount(username);
+ },
+		
+    });
+}
+
+	function filter(JSON) {
+		for (i = 0; i < JSON.items.length; i += 1) {
+			JSON.items[i] = {"id": JSON.items[i].id, "time": JSON.items[i].created_time, "likes": JSON.items[i].likes.count, "comments": JSON.items[i].comments.count};
+
+		}
+
+
+	}
+	
+	
+	function getIdArray(JSON, source) {
+		
+		for (i = 0; i < JSON.items.length; i += 1) {
+			source.push(JSON.items[i].id.split("_")[0]);
+		}
+
+		return source;
+
+	}
+	
+	function getLikesArray(JSON, source) {
+		
+		for (i = 0; i < JSON.items.length; i += 1) {
+			source.push(JSON.items[i].likes);
+		}
+
+		return source;
+
+	}
+
+	function getCommentsArray(JSON, source) {
+		
+		for (i = 0; i < JSON.items.length; i += 1) {
+			source.push(JSON.items[i].comments);
+		}
+
+		return source;
+
+	}
+
+	
+
+function makeChart(ID, likes, comments, name) {
+
+	if (document.getElementById('private')) {
+		document.body.removeChild(document.getElementById('private'));
+	}
+	
+	if (document.getElementById('noAccount')) {
+		document.body.removeChild(document.getElementById('noAccount'));
+	} 
+	if (document.getElementById('myCanvas')) {
+		document.body.removeChild(document.getElementById('myCanvas'));
+	}
+
+	var canv = document.createElement('canvas');
+	canv.id = "myCanvas";
+	canv.width = "200";
+	canv.height = "70";
+	document.body.appendChild(canv);
+	
+	var ctx = document.getElementById('myCanvas').getContext('2d');
+	var myChart = new Chart(ctx, {
+  		type: 'bar',
+  		data: {
+    labels: ID,
+    datasets: [{
+      label: 'Likes',
+      data: likes, 
+      backgroundColor: "rgba(251,70,78,0.6)"
+    },
+    {
+      label: 'Comments',
+      data: comments, 
+      backgroundColor: "rgba(69, 187, 250, 0.6)"
+    }]
+  }, options: {
+  	title: {
+            display: true,
+            fontSize: 20,
+            text: "Data for Instagram User: " + name
+        },
+    scales: {
+      xAxes: [{
+      	ticks: {
+                fontSize: 10
+            },
+        stacked: true,
+        scaleLabel: {
+        display: true,
+        labelString: "Image ID"
+      }
+      }],
+      yAxes: [{
+      	ticks: {
+                fontSize: 12
+            },
+        stacked: true,
+        scaleLabel: {
+        display: true,
+        labelString: "Popularity"
+      }
+      }]
+    }
+}
+});
+	return myChart;
+
+}
+
+function privateAccount(name) {
+	if (document.getElementById('noAccount')) {
+		document.body.removeChild(document.getElementById('noAccount'));
+	} 
+	if (document.getElementById('myCanvas')) {
+		document.body.removeChild(document.getElementById('myCanvas'));
+	}
+	if (document.getElementById('private')) {
+		document.body.removeChild(document.getElementById('private'));
+	}
+	var priv = document.createElement("h3");
+	priv.id = "private";
+	priv.innerHTML = name + " has no public images!";
+	priv.style.textAlign = "center";
+	priv.style.color = "rgb(102, 102, 102)"
+	
+	document.body.appendChild(priv);
+
+}
+
+function noAccount(name) {
+	if (document.getElementById('noAccount')) {
+		document.body.removeChild(document.getElementById('noAccount'));
+	} 
+	if (document.getElementById('myCanvas')) {
+		document.body.removeChild(document.getElementById('myCanvas'));
+	}
+	if (document.getElementById('private')) {
+		document.body.removeChild(document.getElementById('private'));
+	}
+	var no = document.createElement("h3");
+	no.id = "noAccount";
+	no.innerHTML = name + " cannot be found.";
+	no.style.textAlign = "center";
+	no.style.color = "rgb(102, 102, 102)"
+	
+	document.body.appendChild(no);
+
+}
+
+
+
+
+</script>
+
+
+
+</body>
+</html>
