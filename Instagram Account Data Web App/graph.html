@@ -20,7 +20,7 @@
 
 <body>
 	<a href="https://www.gopikolo.com/">
-<img border="0" alt="Pikolo" src="logo.png" width="100" height="100">
+<img border="0" alt="Pikolo" src="logo.png" width="100" height="100">       <!-- Pikolo logo -->
 </a>
 	<div class="container">
 	<div class="row">
@@ -40,20 +40,20 @@
 </div>
 </br>
 
-<canvas id="myCanvas" width="200" height="73" style="display:block;">
+<canvas id="myCanvas" width="200" height="73" style="display:block;">			<!-- Canvas for Chart.js -->
 </canvas>
 
 
 
-<script>
+<script>            
 
-function key_down(e) {
+function key_down(e) {										//display upon pressing enter key
     if(e.keyCode === 13) {
     	display(document.getElementById("search").value);
     }
   }
 
-document.getElementById("button").addEventListener("click", function() {
+document.getElementById("button").addEventListener("click", function() {     //display upon pressing search button
     display(document.getElementById("search").value);
 }, false);
 
@@ -61,10 +61,10 @@ document.getElementById("button").addEventListener("click", function() {
 function display(username) {
 
 	var insta =$.ajax({
-        url: "https://crossorigin.me/https://www.instagram.com/" + username + "/media/",
+        url: "https://crossorigin.me/https://www.instagram.com/" + username + "/media/",        //get JSON from specific user
         dataType: "json",
         success: function(data) {
-        	if(data.items.length == 0) {
+        	if(data.items.length == 0) {					//either user is private or has no pictures
 				privateAccount(username);
 
 		} else {
@@ -78,14 +78,14 @@ function display(username) {
 				var chart = makeChart(ID, likes, comments, document.getElementById("search").value);
 			}
 
-	},  error: function(error){
+	},  error: function(error){      //user does not exist
         noAccount(username);
  },
 		
     });
 }
 
-	function filter(JSON) {
+	function filter(JSON) {       //create filtered JSON with only data we care about
 		for (i = 0; i < JSON.items.length; i += 1) {
 			JSON.items[i] = {"id": JSON.items[i].id, "time": JSON.items[i].created_time, "likes": JSON.items[i].likes.count, "comments": JSON.items[i].comments.count};
 
@@ -95,7 +95,7 @@ function display(username) {
 	}
 	
 	
-	function getIdArray(JSON, source) {
+	function getIdArray(JSON, source) {           //create array of picture ID's without User ID attached
 		
 		for (i = 0; i < JSON.items.length; i += 1) {
 			source.push(JSON.items[i].id.split("_")[0]);
@@ -105,7 +105,7 @@ function display(username) {
 
 	}
 	
-	function getLikesArray(JSON, source) {
+	function getLikesArray(JSON, source) {        //create array of likes count per picture
 		
 		for (i = 0; i < JSON.items.length; i += 1) {
 			source.push(JSON.items[i].likes);
@@ -115,7 +115,7 @@ function display(username) {
 
 	}
 
-	function getCommentsArray(JSON, source) {
+	function getCommentsArray(JSON, source) {           //create array of comments count per picture
 		
 		for (i = 0; i < JSON.items.length; i += 1) {
 			source.push(JSON.items[i].comments);
@@ -127,7 +127,7 @@ function display(username) {
 
 	
 
-function makeChart(ID, likes, comments, name) {
+function makeChart(ID, likes, comments, name) {             //if a message or chart is currently being displayed, remove it
 
 	if (document.getElementById('private')) {
 		document.body.removeChild(document.getElementById('private'));
@@ -195,7 +195,7 @@ function makeChart(ID, likes, comments, name) {
 
 }
 
-function privateAccount(name) {
+function privateAccount(name) {                                           //delete item currently being displayed and print that no pictures were found
 	if (document.getElementById('noAccount')) {
 		document.body.removeChild(document.getElementById('noAccount'));
 	} 
@@ -215,7 +215,7 @@ function privateAccount(name) {
 
 }
 
-function noAccount(name) {
+function noAccount(name) {                            //delete item currently being displayed and print that no account was found
 	if (document.getElementById('noAccount')) {
 		document.body.removeChild(document.getElementById('noAccount'));
 	} 
